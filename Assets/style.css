@@ -1,0 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#current-forecast {
+    border: .1em solid;
+    height: 10em;
+}
+
+form {
+    border-bottom: .1em solid grey;
+    
+}
+
+button {
+    padding: .3em;
+    width: 100%;
+}
+
+#search-bar {
+    width: 100%;
+}
+
+#submit-button {
+    width: 100%;
+}
