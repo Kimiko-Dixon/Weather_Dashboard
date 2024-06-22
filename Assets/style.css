@@ -5,7 +5,8 @@
 
 #current-forecast {
     border: .1em solid;
-    height: 10em;
+    height: fit-content;
+    min-height: 10em;
 }
 
 form {
