@@ -2,7 +2,7 @@
 const searchBar = $('#search-bar');
 const submitButton = $('#submit-button');
 const currentForecast = $('#current-forecast');
-const fiveDayForecast = $('#5-day-forecast')
+const fiveDayForecast = $('#display-5-day-forecast')
 const searchHistory = $('#search-history')
 
 const searchArray = JSON.parse(localStorage.getItem('history')) || []
@@ -30,25 +30,11 @@ function setCoordinates(event)
     
 }
 
-//Temp solution
-/* function setCoordinatesHistory(event)
-{
 
-    currentForecast.empty()
-    fiveDayForecast.empty()
-    searchBar.val('')
-
-    const search = event.target.innerText 
-    // finish url from search in search bar and call getForecast(url)
-    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${search}&units=imperial&appid=7121d6ca09d4658288ef53c29a232677`;
-    getForcast(url)
-    
-} */
-
-function displayForcasts(today, fiveDay, cityName)
+function displayTodaysForcast(today, cityName)
 {
     
-    const iconCode = today.weather[0].icon ;
+    const iconCode = today.weather[0].icon;
     const icon =`https://openweathermap.org/img/wn/${iconCode}@2x.png`
 
     const todaysForecast = $('<div>')
@@ -69,34 +55,62 @@ function displayForcasts(today, fiveDay, cityName)
 
     nameDateIcon.append(weather)
     todaysForecast.append(nameDateIcon)
-    // todaysForecast.append(weather)
     todaysForecast.append(temperature)
     todaysForecast.append(windSpeed)
     todaysForecast.append(humidity)
 
     currentForecast.append(todaysForecast)
 
-    let inArray;
-    if(searchArray.length === 0)
+}
+
+function display5DayForcast(fiveDay, cityName)
+{
+    for(let day of fiveDay)
     {
-        setSearchHistory(cityName)
+        const dateOfDay = day.dt_txt.split(' ')
+        const iconCode = day.weather[0].icon;
+        const icon = `https://openweathermap.org/img/wn/${iconCode}@2x.png`
+
+        const dayForecast = $('<div>')
+        const date = $('<p>')
+        const weather = $('<img>')
+        const temperature = $('<p>')
+        const windSpeed = $('<p>')
+        const humidity = $('<p>')
+
+        dayForecast.attr('class', 'col')
+        // dayForecast.attr('style', 'background-color: blue; margin-right: 1em; padding-right: 4em')
+        weather.attr('src', icon)
+        weather.attr('style', 'max-width: 30%; height: auto;')
+        date.text(`${dayjs(dateOfDay[0]).format('MM/DD/YYYY')}`)
+        temperature.text(`Temp: ${day.main.temp}°F`)
+        windSpeed.text(`Wind: ${day.wind.speed} MPH`)
+        humidity.text(`Humidity: ${day.main.humidity} %`)
+
+        // date.attr('style', 'font-weight: bold; font-size: 1.5em; margin-bottom: 0')
+
+        
+        dayForecast.append(date)
+        dayForecast.append(weather)
+        dayForecast.append(temperature)
+        dayForecast.append(windSpeed)
+        dayForecast.append(humidity)
+
+        fiveDayForecast.append(dayForecast) 
+
+       
     }
-    else
-    {
-        for (let i = 0; i < searchArray.length; i++) 
-        {
-            if (cityName.toUpperCase() != searchArray[i].toUpperCase()) {
-                inArray = false
-            }
-            else {
-                inArray = true
-            }
+
+    let inArray = false;
+    for (let search of searchArray) {
+        if (cityName.toUpperCase() === search.toUpperCase()) {
+            inArray = true
         }
     }
     
 
-    if(inArray === false)
-    {
+
+    if (inArray === false || searchArray.length === 0) {
         setSearchHistory(cityName)
     }
 }
@@ -119,16 +133,6 @@ function displaySearchHistory()
        
 }
 
-/* function inHistory()
-{
-    for (let search in searchArray)
-    {
-        if (searchTerm != search || searchArray.length === 0)
-        {
-            setSearchHistory()
-        }
-    }
-} */
 function setSearchHistory(cityName)
 {
 
@@ -204,7 +208,8 @@ function getForcast(completeURL)
 
                 console.log(fiveDay);
                 console.log(today);
-                displayForcasts(today, fiveDay, cityName)
+                displayTodaysForcast(today, cityName)
+                display5DayForcast(fiveDay,cityName)
             })
         }
 
