@@ -1,36 +1,38 @@
+/*Universal selector*/
 * {
     margin: 0;
     padding: 0;
 }
 
+/*Today's forecast*/
 #current-forecast {
     border: .1em solid;
     height: fit-content;
     min-height: 10em;
 }
 
+/*Search bar and button*/
 form {
     border-bottom: .1em solid grey;
     
 }
 
+/*Buttons*/
 button {
     padding: .3em;
     width: 100%;
 }
-
+/*Search bar*/
 #search-bar {
     width: 100%;
 }
-
+/*Search button*/
 #submit-button {
     width: 100%;
 }
-
-/* .container {
-    padding-left: .8em;
+/*Heading*/
+h1 {
+    text-align: end;
+    padding: .5rem;
+    background-color: blue;
 }
-
-p {
-    padding-right: 0em;
-} */
