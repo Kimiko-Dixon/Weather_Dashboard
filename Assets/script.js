@@ -1,21 +1,25 @@
 
+// Select HTML elements
 const searchBar = $('#search-bar');
 const submitButton = $('#submit-button');
 const currentForecast = $('#current-forecast');
 const fiveDayForecast = $('#display-5-day-forecast')
 const searchHistory = $('#search-history')
 
+// Read or create a local storage array
 const searchArray = JSON.parse(localStorage.getItem('history')) || []
 
-
+// Finishes the URL for the API
 function setCoordinates(event)
 {
     event.preventDefault();
-    console.log(event)
     let search;
+
+    // Empty the displayed forecasts
     currentForecast.empty()
     fiveDayForecast.empty() 
 
+    // If the submit button was clicked, then set search to the search bar's value, else set it to the text of the button in history
     if (event.target.id === 'submit-button')
     {
         search = searchBar.val()  
@@ -24,16 +28,16 @@ function setCoordinates(event)
     {
         search = event.target.innerText
     }
-    // finish url from search in search bar and call getForecast(url)
+    // Finish url and and call getForecast
     const url = `https://api.openweathermap.org/data/2.5/forecast?q=${search}&units=imperial&appid=7121d6ca09d4658288ef53c29a232677`;
     getForcast(url)
     
 }
 
-
+// Display today's forecast
 function displayTodaysForcast(today, cityName)
 {
-    
+    // finish the icon url
     const iconCode = today.weather[0].icon;
     const icon =`https://openweathermap.org/img/wn/${iconCode}@2x.png`
 
@@ -59,15 +63,20 @@ function displayTodaysForcast(today, cityName)
     todaysForecast.append(windSpeed)
     todaysForecast.append(humidity)
 
+    // Add the forecast information to the page
     currentForecast.append(todaysForecast)
 
 }
 
+// Displays the five day forecast
 function display5DayForcast(fiveDay, cityName)
 {
     for(let day of fiveDay)
     {
+        // Separate the date from the time
         const dateOfDay = day.dt_txt.split(' ')
+
+        // finish the icon url
         const iconCode = day.weather[0].icon;
         const icon = `https://openweathermap.org/img/wn/${iconCode}@2x.png`
 
@@ -96,11 +105,12 @@ function display5DayForcast(fiveDay, cityName)
         dayForecast.append(windSpeed)
         dayForecast.append(humidity)
 
+          // Add the forecast information to the page
         fiveDayForecast.append(dayForecast) 
 
-       
     }
 
+    // If the search is already in history, do not add it to history, else, add to history
     let inArray = false;
     for (let search of searchArray) {
         if (cityName.toUpperCase() === search.toUpperCase()) {
@@ -108,17 +118,17 @@ function display5DayForcast(fiveDay, cityName)
         }
     }
     
-
-
     if (inArray === false || searchArray.length === 0) {
         setSearchHistory(cityName)
     }
 }
 
+// Display the search history
 function displaySearchHistory()
 {
     searchHistory.empty()
 
+    //Create a button for each city in history
     for (let search of searchArray)
     {
     const historyButton = $('<button>')
@@ -133,10 +143,10 @@ function displaySearchHistory()
        
 }
 
+//Adds a search to the search history array in local storage
 function setSearchHistory(cityName)
 {
 
-    //create object for search results or re search in api
     searchArray.push(cityName)
     localStorage.setItem('history', JSON.stringify(searchArray))
     displaySearchHistory()
@@ -146,9 +156,10 @@ function setSearchHistory(cityName)
 function getForcast(completeURL)
 {
     
-    //get todays and 5 day forecast call displayForecasts(today, fiveDay)
+    // Retrieve content from API 
     fetch(completeURL).then(function(response)
     {
+        // Error message if retrieval fails
         if (response.status != 200)
         {
             const errorMessage = $('<div>')
@@ -165,11 +176,12 @@ function getForcast(completeURL)
             $('#error').append(errorMessage)
 
         }
+
+        // Sort for today's and the next five day's forecasts
         else
         {
             response.json().then(function(data)
             {
-               console.log(data)
 
                let dayCounter = 0
                const  cityName = data.city.name;
@@ -179,7 +191,7 @@ function getForcast(completeURL)
                const dates = [];
                const fiveDay = [];
 
-                
+                //Create the array of the next five day's forecasts
                 while (dayCounter < 5) {
                     baseDate = baseDate.add(1, 'day')
                     const formattedDate = baseDate.format("YYYY-MM-DD HH:mm:ss")
@@ -191,13 +203,9 @@ function getForcast(completeURL)
                 
                 for (let date of dates)
                 {
-                        
-                    console.log(date)
-                    
 
                     for(let d of data.list) 
                     {
-                        console.log(d.dt_txt)
                         if (d.dt_txt.match(date))
                         {
                             fiveDay.push(d)
@@ -205,9 +213,7 @@ function getForcast(completeURL)
                     }
                 }
                 
-
-                console.log(fiveDay);
-                console.log(today);
+                // Call functions to display the forecasts
                 displayTodaysForcast(today, cityName)
                 display5DayForcast(fiveDay,cityName)
             })
@@ -216,11 +222,10 @@ function getForcast(completeURL)
     })
 }
 
-// read history from local storage, display last seached forcast for coordinates, and display both, click event
-    $(document).ready(function()
-    {
-        displaySearchHistory()
-        submitButton.on('click', setCoordinates)
-    })
+// Read history from local storage, display history, and load search button click event
+$(document).ready(function () {
+    displaySearchHistory()
+    submitButton.on('click', setCoordinates)
+})
     
 
